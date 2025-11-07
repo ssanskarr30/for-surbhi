@@ -1,0 +1,709 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>For Surbhi 💖</title>
+
+<!-- Keep your existing manifest + service worker file in the project -->
+<link rel="manifest" href="manifest.webmanifest" />
+<meta name="theme-color" content="#ff5da2" />
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&family=Sacramento&display=swap" rel="stylesheet" />
+
+<style>
+:root{
+  --bg:#0f0e17; --card:#151426; --muted:#9aa0a6; --accent:#ff5da2; --accent2:#7cf1b4; --text:#fff; --gold:#ffd166;
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0; font-family:Poppins,system-ui,Segoe UI,Roboto,Ubuntu,Cantarell,Noto Sans,sans-serif;
+  color:var(--text);
+  background:radial-gradient(60vw 60vw at 10% 10%, #1f1d3b 0%, #0f0e17 50%, #0b0a12 100%);
+  overflow-x:hidden;
+}
+.topbar{
+  position:sticky; top:0; z-index:20; display:flex; align-items:center; justify-content:space-between; gap:10px;
+  padding:12px 14px; background:rgba(15,14,23,0.8); backdrop-filter:blur(8px);
+  border-bottom:1px solid rgba(255,255,255,0.06);
+}
+.brand{font-weight:700}
+.script{font-family:Sacramento,cursive; font-size:40px; color:var(--gold)}
+nav{display:flex; flex-wrap:wrap; gap:6px}
+.tab-btn{
+  background:#1d1c30; color:#dfe7ff; border:1px solid rgba(255,255,255,0.08);
+  border-radius:10px; padding:8px 10px; cursor:pointer
+}
+.tab-btn.active{border-color:#ffd166; box-shadow:0 0 0 2px rgba(255,209,102,.15) inset}
+.wrap{max-width:1060px; margin:0 auto; padding:16px}
+.card{
+  background:linear-gradient(180deg, rgba(255,255,255,0.05), rgba(255,255,255,0.02));
+  border:1px solid rgba(255,255,255,0.08); border-radius:24px; padding:18px;
+  box-shadow:0 10px 40px rgba(0,0,0,0.35); margin-bottom:16px
+}
+.inner{border-radius:18px; background:#121123}
+.center{text-align:center}
+.right{text-align:right}
+.grid-2{display:grid; grid-template-columns:1fr 1fr; gap:12px}
+@media (max-width:860px){.grid-2{grid-template-columns:1fr}}
+.note{font-size:15px; color:#e9efff; opacity:0.95; line-height:1.7}
+.row{display:flex; gap:10px; flex-wrap:wrap; align-items:center}
+.btn{
+  display:inline-flex; align-items:center; justify-content:center; gap:8px;
+  padding:12px 16px; border-radius:12px; border:1px solid rgba(255,255,255,0.12);
+  background:linear-gradient(180deg, #2a293f, #201f33); color:#fff; cursor:pointer; text-decoration:none
+}
+.btn.ghost{background:#1e1d34}
+input,select{background:#14132d; color:#e9f1ff; border:1px solid rgba(255,255,255,0.12); border-radius:10px; padding:10px}
+.tiny{font-size:12px; color:var(--muted)}
+.compliment{font-size:20px; text-align:center; padding:18px; border-radius:16px; background:#161533; border:1px solid rgba(255,255,255,0.08); min-height:64px}
+.gallery{display:grid; grid-template-columns:repeat(4,1fr); gap:10px}
+@media (max-width:860px){.gallery{grid-template-columns:repeat(2,1fr)}}
+.thumb{position:relative; aspect-ratio:1/1; background:#1b1a30; border:1px solid rgba(255,255,255,0.08); border-radius:14px; overflow:hidden}
+.thumb img{width:100%; height:100%; object-fit:cover}
+.thumb .del{position:absolute; top:6px; right:6px; background:rgba(0,0,0,0.6); border:1px solid rgba(255,255,255,0.2); color:#fff; border-radius:8px; padding:4px 6px; cursor:pointer}
+.list{line-height:2; font-size:16px}
+.footer{text-align:center; color:var(--muted); margin:22px auto 80px; font-size:13px}
+.tab{display:none}
+.tab.active{display:block}
+#confetti{position:fixed; inset:0; pointer-events:none; z-index:5}
+.install{position:fixed; left:50%; transform:translateX(-50%); bottom:16px; background:#121123; border:1px solid rgba(255,255,255,0.1); border-radius:14px; padding:10px 12px; display:flex; gap:8px; align-items:center; z-index:30}
+.hidden{display:none}
+.att-item{display:flex; align-items:center; justify-content:space-between; gap:8px; padding:8px 0; border-bottom:1px dashed rgba(255,255,255,0.06)}
+.badge{display:inline-block; padding:2px 8px; border-radius:999px; font-size:12px; border:1px solid rgba(255,255,255,0.12); cursor:pointer}
+.badge.present{background:rgba(0,255,0,.15); color:#8ef08e}
+.badge.absent{background:rgba(255,0,0,.15); color:#ffacac}
+.badge.holiday{background:rgba(255,215,0,.15); color:#ffd166}
+.bar{height:10px; background:#2a2942; border-radius:6px; overflow:hidden}
+.bar > div{height:100%; background:linear-gradient(90deg, #ff5da2, #ffd166)}
+/* Hearts */
+.heart{position:fixed; bottom:-40px; opacity:.9; animation:floatUp 6s linear}
+@keyframes floatUp{0%{transform:translateY(0)}100%{transform:translateY(-120vh)}}
+</style>
+</head>
+
+<body>
+<canvas id="confetti"></canvas>
+
+<header class="topbar">
+  <div class="brand">For <span class="script">Surbhi</span> 💖</div>
+  <nav>
+    <button class="tab-btn" data-tab="home">Home</button>
+    <button class="tab-btn" data-tab="hydration">Hydration</button>
+    <button class="tab-btn" data-tab="timetable">Timetable</button>
+    <button class="tab-btn" data-tab="attendance">Attendance</button>
+    <button class="tab-btn" data-tab="gallery">Gallery</button>
+    <button class="tab-btn" data-tab="playlists">Playlists</button>
+    <button class="tab-btn" data-tab="fitness">Fitness</button>
+  </nav>
+</header>
+
+<main class="wrap">
+  <!-- HOME -->
+  <section id="home" class="tab active card">
+    <h1 class="script center">Dear Surbhi</h1>
+    <p class="note center">You are loved. You are precious. You matter to me—always. ✨</p>
+    <div class="grid-2">
+      <div>
+        <div class="card inner">
+          <h3>💌 A note from Sanskar</h3>
+          <p>
+            I’ve made this for you, for your personal use , I hope you like this...
+            Please remember: you’re loved, valued and important. 💖
+          </p>
+          <p class="right">— Sanskar</p>
+        </div>
+        <div class="row">
+          <button id="celebrate" class="btn">🎉 Tiny celebration</button>
+          <button id="addHeart" class="btn">💗 Floating hearts</button>
+          <button id="clearHearts" class="btn ghost">🧹 Clear hearts</button>
+        </div>
+        <div class="card inner">
+          <h3>🌟 Compliment generator</h3>
+          <div id="complimentBox" class="compliment">You make ordinary moments feel like magic.</div>
+          <button id="complimentBtn" class="btn" style="margin-top:10px">New compliment</button>
+        </div>
+      </div>
+      <div>
+        <div class="card inner">
+          <h3>🎵 Music — “Perfect” vibe</h3>
+          <p class="tiny">Paste a direct MP3 link you control, or open on Spotify / YouTube.</p>
+          <input id="musicUrl" placeholder="Direct MP3 link (https://...)" />
+          <div class="row">
+            <button id="playMusic" class="btn">▶ Play / Pause</button>
+            <a class="btn ghost" href="https://open.spotify.com/track/0tgVpDi06FyKpA1z0VMD4v" target="_blank" rel="noopener">Open on Spotify</a>
+            <a class="btn ghost" href="https://youtube.com/watch?v=2Vv-BfVoq4g" target="_blank" rel="noopener">Open on YouTube</a>
+          </div>
+          <audio id="player" preload="none"></audio>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- HYDRATION -->
+  <section id="hydration" class="tab card">
+    <h2>🥤 Hydration reminders</h2>
+    <p class="tiny">Enable browser notifications and pick how often I should nudge you.</p>
+    <div class="row">
+      <button id="enableNoti" class="btn">Enable Notifications</button>
+      <select id="hydrationInterval">
+        <option value="60">Every 1 hour</option>
+        <option value="180">Every 3 hours</option>
+        <option value="360">Every 6 hours</option>
+        <option value="1440">Daily</option>
+      </select>
+      <button id="startHydration" class="btn">Start</button>
+      <button id="stopHydration" class="btn ghost">Stop</button>
+    </div>
+    <p id="hydrationStatus" class="tiny">Status: reminders off.</p>
+    <div class="card inner">
+      <h3>Daily water log</h3>
+      <div class="row">
+        <button data-drink="250" class="btn">+250ml</button>
+        <button data-drink="500" class="btn">+500ml</button>
+        <button data-drink="750" class="btn">+750ml</button>
+        <button id="resetWater" class="btn ghost">Reset today</button>
+      </div>
+      <p class="note">Today’s total: <span id="waterTotal">0</span> ml</p>
+    </div>
+    <div class="card inner">
+      <h3>Last 7 days</h3>
+      <div id="weekBars"></div>
+    </div>
+  </section>
+
+  <!-- TIMETABLE -->
+  <section id="timetable" class="tab card">
+    <h2>🗓️ Weekly Timetable</h2>
+    <div id="ttContainer"></div>
+  </section>
+
+  <!-- ATTENDANCE -->
+  <section id="attendance" class="tab card">
+    <h2>✅ Attendance</h2>
+    <div class="row">
+      <input type="date" id="attDate">
+      <button id="markHolidayDay" class="btn">Mark entire day Holiday</button>
+      <button id="resetAllAtt" class="btn ghost">Reset all attendance</button>
+    </div>
+    <div class="card inner">
+      <h3>Mark for selected day</h3>
+      <div id="attSlots" class="att-list"></div>
+      <p id="attDaySummary" class="tiny">—</p>
+    </div>
+    <div class="card inner">
+      <h3>Subject-wise summary</h3>
+      <div id="subjects"></div>
+    </div>
+  </section>
+
+  <!-- GALLERY -->
+  <section id="gallery" class="tab card">
+    <h2>📸 Gallery (local)</h2>
+    <p class="tiny">Add photos or click with camera. Images stay on your device (not uploaded).</p>
+    <div class="row">
+      <label class="btn">
+        Upload
+        <input id="pickImages" type="file" multiple accept="image/*" hidden>
+      </label>
+      <label class="btn ghost">
+        Camera
+        <input id="cameraCapture" type="file" accept="image/*" capture="environment" hidden>
+      </label>
+    </div>
+    <div id="galleryGrid" class="gallery"></div>
+  </section>
+
+  </section>
+
+  <!-- 🎧 PLAYLISTS -->
+<section id="playlists" class="tab card">
+  <h2>🎧 Playlists</h2>
+
+  <!-- Add New Playlist -->
+  <div class="card inner">
+    <h3>Add New Playlist</h3>
+    <div class="row">
+      <input id="plName" placeholder="Playlist name" />
+      <input id="plLink" placeholder="Spotify playlist link" />
+      <button id="addPlaylist" class="btn">Add Playlist</button>
+    </div>
+  </div>
+
+  <!-- Saved Playlists -->
+  <div id="playlistList"></div>
+</section>
+
+
+  <!-- FITNESS -->
+  <section id="fitness" class="tab card">
+    <h2>🚶 Fitness</h2>
+    <div class="card inner">
+      <h3>Steps (best-effort)</h3>
+      <p class="tiny">We estimate using motion sensors; if unsupported, set manually.</p>
+      <p>Estimated steps today: <span id="steps">0</span></p>
+      <div class="row">
+        <button id="startSteps" class="btn">Start estimate</button>
+        <button id="stopSteps" class="btn ghost">Stop</button>
+        <input id="manualSteps" type="number" placeholder="Set steps…" />
+        <button id="applySteps" class="btn ghost">Apply</button>
+      </div>
+    </div>
+    <div class="card inner">
+      <h3>Heart rate (manual)</h3>
+      <p class="tiny">Enter when measured on a watch/oximeter.</p>
+      <div class="row">
+        <input id="pulse" type="number" placeholder="bpm e.g., 78" />
+        <button id="savePulse" class="btn">Save</button>
+      </div>
+      <p>Last saved: <span id="pulseSaved">—</span></p>
+    </div>
+  </section>
+
+  <p class="footer">Made with love by Sanskar — <span id="year"></span></p>
+</main>
+
+<!-- Install prompt -->
+<div id="installPrompt" class="install hidden">
+  <span>Install “For Surbhi 💖” to your home screen?</span>
+  <button id="installBtn" class="btn">Install</button>
+  <button id="installClose" class="btn ghost">Later</button>
+</div>
+
+<script>
+/* ========= UTIL & TAB ROUTER ========= */
+const $ = s => document.querySelector(s);
+const $$ = s => document.querySelectorAll(s);
+const LS = {
+  get:(k,d=null)=>{ try{return JSON.parse(localStorage.getItem(k))??d}catch{return d} },
+  set:(k,v)=>localStorage.setItem(k, JSON.stringify(v)),
+  del:(k)=>localStorage.removeItem(k),
+};
+
+// Tabs
+function showTab(name){
+  $$('.tab').forEach(el=>el.classList.remove('active'));
+  $$('.tab-btn').forEach(b=>b.classList.remove('active'));
+  const sec = '#'+name;
+  const btn = `.tab-btn[data-tab="${name}"]`;
+  if ($(sec)) $(sec).classList.add('active');
+  if ($(btn)) $(btn).classList.add('active');
+  window.scrollTo({top:0, behavior:'smooth'});
+  LS.set('lastTab', name);
+}
+$$('.tab-btn').forEach(btn=>btn.addEventListener('click', ()=>showTab(btn.dataset.tab)));
+showTab(LS.get('lastTab','home'));
+
+// Year
+$('#year').textContent = new Date().getFullYear();
+
+/* ========= CONFETTI + HEARTS ========= */
+const canvas = $('#confetti'); const ctx = canvas.getContext('2d');
+function resize(){ canvas.width = innerWidth; canvas.height = innerHeight; } addEventListener('resize', resize); resize();
+let parts = [];
+function burst(){
+  for(let i=0;i<160;i++){
+    parts.push({x:canvas.width/2, y:canvas.height/3, vx:(Math.random()*2-1)*6, vy:(Math.random()*2-1)*6-2, g:0.12+Math.random()*0.1, s:3+Math.random()*4, life:80+Math.random()*40});
+  }
+}
+function tick(){
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  parts.forEach(p=>{ p.vy+=p.g; p.x+=p.vx; p.y+=p.vy; p.life--; ctx.globalAlpha=Math.max(p.life/120,0);
+    ctx.fillStyle=['#ff5da2','#7cf1b4','#ffd166','#8ecaff','#c49bff'][Math.floor(Math.random()*5)];
+    ctx.fillRect(p.x,p.y,p.s,p.s);
+  });
+  parts = parts.filter(p=>p.life>0 && p.y < canvas.height+20);
+  requestAnimationFrame(tick);
+}
+tick();
+$('#celebrate').addEventListener('click', burst);
+
+let heartInterval=null;
+function startHearts(){
+  stopHearts();
+  heartInterval = setInterval(()=>{
+    const h = document.createElement('div');
+    h.className='heart';
+    h.textContent=['💖','💗','💞','💓','💝'][Math.floor(Math.random()*5)];
+    h.style.left = (Math.random()*90+5)+'vw';
+    h.style.fontSize = (18+Math.random()*24)+'px';
+    document.body.appendChild(h);
+    setTimeout(()=>h.remove(), 6000);
+  }, 300);
+}
+function stopHearts(){
+  if(heartInterval) clearInterval(heartInterval);
+  heartInterval=null;
+  document.querySelectorAll('.heart').forEach(h=>h.remove());
+}
+$('#addHeart').addEventListener('click', startHearts);
+$('#clearHearts').addEventListener('click', stopHearts);
+
+/* ========= COMPLIMENTS ========= */
+const compliments = [
+  "You make ordinary moments feel like magic.",
+  "Your smile fixes bad days in 0.1 seconds.",
+  "The way you care is my favourite thing about you.",
+  "You are the softest place to land after a hard day.",
+  "You’re the first person I want to share good news with.",
+  "You’re sunshine with a little stardust.",
+  "You make me want to be better—gently, not forcefully.",
+  "Your presence feels like home.",
+  "Your laugh is a song I replay in my head.",
+  "You are enough. Always."
+];
+$('#complimentBtn').addEventListener('click', ()=>{ $('#complimentBox').textContent = compliments[Math.floor(Math.random()*compliments.length)]; });
+
+/* ========= MUSIC ========= */
+const player = $('#player'); const musicUrl = $('#musicUrl');
+musicUrl.value = LS.get('musicUrl','') || '';
+$('#playMusic').addEventListener('click', async ()=>{
+  const url = musicUrl.value.trim(); if (!url) { alert('Paste a direct MP3 link first 🙂'); return; }
+  if (player.src !== url) player.src = url; LS.set('musicUrl', url);
+  if (player.paused) { try{ await player.play(); } catch(e){ alert('Autoplay blocked; press Play again.'); } }
+  else player.pause();
+});
+
+/* ========= HYDRATION ========= */
+const keyCfg='hydration_cfg', keyWater='water_today', keyHist='water_hist';
+function updateHydrationStatus(){
+  const cfg = LS.get(keyCfg);
+  $('#hydrationStatus').textContent = cfg?.on ? `Status: every ${cfg.minutes} min (started ${new Date(cfg.started).toLocaleString()})` : 'Status: reminders off.';
+}
+$('#enableNoti').addEventListener('click', async ()=>{ try{ const p=await Notification.requestPermission(); alert(p==='granted'?'Notifications enabled ✅':'Permission not granted'); }catch{ alert('Notifications not supported'); } });
+let hydrationTimer;
+function scheduleHydration(mins){
+  if(hydrationTimer) clearInterval(hydrationTimer);
+  hydrationTimer=setInterval(()=>{
+    if (Notification.permission==='granted'){ new Notification('Hi Surbhi 💖', { body:'Tiny reminder to sip some water 🥤' }); }
+  }, mins*60*1000);
+}
+$('#startHydration').addEventListener('click', ()=>{
+  const minutes = parseInt($('#hydrationInterval').value,10);
+  LS.set(keyCfg,{on:true, minutes, started:Date.now()}); scheduleHydration(minutes); updateHydrationStatus();
+});
+$('#stopHydration').addEventListener('click', ()=>{ LS.set(keyCfg,{on:false}); if(hydrationTimer) clearInterval(hydrationTimer); updateHydrationStatus(); });
+
+function todayKey(){ return new Date().toDateString(); }
+function getToday(){ let t=LS.get(keyWater); if(!t||t.date!==todayKey()){ t={date:todayKey(), ml:0}; LS.set(keyWater,t);} return t; }
+function setToday(t){ LS.set(keyWater,t); renderToday(); pushHist(t); renderWeek(); }
+function renderToday(){ const t=getToday(); $('#waterTotal').textContent=t.ml; }
+$$('[data-drink]').forEach(b=>b.addEventListener('click', ()=>{ const amt=parseInt(b.dataset.drink,10); const t=getToday(); t.ml+=amt; setToday(t); }));
+$('#resetWater').addEventListener('click', ()=>{ if(confirm('Reset today’s total?')) setToday({date:todayKey(), ml:0}); });
+
+function pushHist(t){
+  let hist=LS.get(keyHist,[]); const idx = hist.findIndex(x=>x.date===t.date);
+  if(idx>=0) hist[idx]=t; else hist.push(t);
+  hist = hist.slice(-30); LS.set(keyHist,hist);
+}
+function renderWeek(){
+  const hist=LS.get(keyHist,[]); const container=$('#weekBars'); container.innerHTML='';
+  const days=[]; for(let i=6;i>=0;i--){ const d=new Date(); d.setDate(d.getDate()-i); days.push(d.toDateString()); }
+  days.forEach(day=>{
+    const rec = hist.find(x=>x.date===day) || {ml:0};
+    const outer=document.createElement('div'); outer.className='bar'; outer.style.margin='8px 0';
+    const inner=document.createElement('div'); inner.style.width=Math.min(100,(rec.ml/2000)*100)+'%';
+    outer.appendChild(inner);
+    const label=document.createElement('div'); label.className='tiny'; label.textContent=day.split(' ').slice(0,3).join(' ') + ` — ${rec.ml} ml`;
+    container.appendChild(label); container.appendChild(outer);
+  });
+}
+
+/* ========= TIMETABLE DATA ========= */
+const timetable = {
+  "Monday": [
+    ["09:00–10:00","LPM (Theory)"],
+    ["10:00–11:00","Physiology"],
+    ["11:00–13:00","Free for her"],
+    ["13:00–14:00","Lunch"],
+    ["14:00–16:00","VAN (Batch C)"],
+  ],
+  "Tuesday": [
+    ["09:00–10:00","LPM (Theory)"],
+    ["10:00–11:00","Physiology"],
+    ["11:00–13:00","VPY (Batch C)"],
+    ["13:00–14:00","Lunch"],
+    ["14:00–16:00","LPM (Batch C)"],
+  ],
+  "Wednesday": [
+    ["09:00–10:00","VAN (Theory)"],
+    ["10:00–11:00","Physiology"],
+    ["11:00–13:00","VAN (Batch C)"],
+    ["13:00–14:00","Lunch"],
+    ["14:00–16:00","Free for her"],
+  ],
+  "Thursday": [
+    ["09:00–10:00","VAN (Theory)"],
+    ["10:00–11:00","Physiology"],
+    ["11:00–13:00","VAN (Batch C)"],
+    ["13:00–14:00","Lunch"],
+    ["14:00–16:00","Work Programme"],
+  ],
+  "Friday": [
+    ["09:00–10:00","VAN (Theory)"],
+    ["10:00–11:00","LPM"],
+    ["11:00–13:00","Free for her"],
+    ["13:00–14:00","Lunch"],
+    ["14:00–16:00","Free for her"],
+  ],
+  "Saturday": [
+    ["09:00–10:00","VAN (Theory)"],
+    ["10:00–11:00","LPM"],
+    ["11:00–13:00","LPM (Batch C)"],
+    ["13:00–14:00","Lunch"],
+    ["14:00–16:00","Free for her"],
+  ],
+  "Sunday": [
+    ["All day","Holiday"]
+  ]
+};
+function isRealClass(subj){ const s=subj.toLowerCase(); return !(s.includes('free for her')||s.includes('lunch')||s.includes('holiday')); }
+function subjectFrom(name){
+  if (name.includes('LPM')) return 'LPM';
+  if (name.includes('VAN')) return 'VAN';
+  if (name.includes('VPY')) return 'VPY';
+  if (name.toLowerCase().includes('physiology')) return 'Physiology';
+  if (name.toLowerCase().includes('work programme')) return 'Work Programme';
+  return name;
+}
+
+/* ========= TIMETABLE RENDER ========= */
+function renderTimetable(){
+  const c=$('#ttContainer'); c.innerHTML='';
+  Object.entries(timetable).forEach(([day, slots])=>{
+    const card=document.createElement('div'); card.className='card inner';
+    card.innerHTML = `<h3>${day}</h3>` + slots.map(s=>`<div class="row"><span><strong>${s[0]}</strong> • ${s[1]}</span></div>`).join('');
+    c.appendChild(card);
+  });
+}
+
+/* ========= ATTENDANCE (per-class + subject-wise stats) ========= */
+const ATT_KEY='attendance_subject_v1'; // {'YYYY-MM-DD': [mark per slot]}
+const attDate = $('#attDate'); attDate.value = new Date().toISOString().slice(0,10);
+function weekdayName(d){ return ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'][d.getDay()]; }
+function slotsForDate(d){ const wd=weekdayName(d); return timetable[wd]||[]; }
+function keyOf(d){ return d.toISOString().slice(0,10); }
+
+(function migrateOld(){
+  const old=LS.get('attendance_v2_web'); if(!old) return;
+  const cur=LS.get(ATT_KEY,{}); if(Object.keys(cur).length===0){ LS.set(ATT_KEY, old); }
+})();
+
+function renderDay(){
+  const d = new Date(attDate.value); const k=keyOf(d);
+  const slots = slotsForDate(d); const store = LS.get(ATT_KEY,{});
+  const arr = store[k] || Array(slots.length).fill('');
+  const list = $('#attSlots'); list.innerHTML='';
+  slots.forEach((s,i)=>{
+    const [time,subj]=s; const cur=arr[i]||'';
+    const row=document.createElement('div'); row.className='att-item';
+    row.innerHTML = `<div><strong>${time}</strong> • ${subj}</div>
+      <div>
+        <button class="badge present ${cur==='Present'?'sel':''}" data-mark="Present" data-index="${i}">Present</button>
+        <button class="badge absent ${cur==='Absent'?'sel':''}" data-mark="Absent" data-index="${i}">Absent</button>
+        <button class="badge holiday ${cur==='Holiday'?'sel':''}" data-mark="Holiday" data-index="${i}">Holiday</button>
+      </div>`;
+    list.appendChild(row);
+  });
+  list.querySelectorAll('button[data-index]').forEach(b=>b.addEventListener('click', ()=>{
+    const i=parseInt(b.dataset.index,10); const mark=b.dataset.mark;
+    const store=LS.get(ATT_KEY,{}); const arr=store[k]||Array(slots.length).fill(''); arr[i]=mark; store[k]=arr; LS.set(ATT_KEY, store);
+    renderDay(); renderSubjects();
+  }));
+
+  // Day summary
+  let total=0,p=0,a=0,h=0;
+  slots.forEach((s,i)=>{ const subj=s[1]; if(!isRealClass(subj)) return; total++; const v=arr[i]||''; if(v==='Present')p++; if(v==='Absent')a++; if(v==='Holiday')h++; });
+  const pct = (p+a)===0?0:(p/(p+a))*100;
+  $('#attDaySummary').textContent = `Present: ${p}  Absent: ${a}  Holiday: ${h}  •  Class slots: ${total}  •  % (excl. holidays): ${pct.toFixed(1)}%`;
+}
+function markWholeDayHoliday(){
+  const d=new Date(attDate.value); const k=keyOf(d); const slots=slotsForDate(d);
+  const arr=Array(slots.length).fill('Holiday'); const store=LS.get(ATT_KEY,{}); store[k]=arr; LS.set(ATT_KEY, store);
+  renderDay(); renderSubjects();
+}
+$('#markHolidayDay').addEventListener('click', markWholeDayHoliday);
+$('#resetAllAtt').addEventListener('click', ()=>{ if(confirm('Reset ALL attendance data?')){ LS.del(ATT_KEY); renderDay(); renderSubjects(); } });
+$('#attDate').addEventListener('change', ()=>{ renderDay(); renderSubjects(); });
+
+function datesInRange(days){
+  const arr=[]; const d=new Date(); d.setHours(0,0,0,0);
+  for(let i=0;i<days;i++){ const t=new Date(d); t.setDate(d.getDate()-i); arr.push(t.toISOString().slice(0,10)); }
+  return arr;
+}
+function computeSubjectStats(){
+  const store=LS.get(ATT_KEY, {});
+  const subjectsSet=new Set();
+  Object.values(timetable).forEach(slots=>slots.forEach(([_,sub])=>{ if(isRealClass(sub)) subjectsSet.add(subjectFrom(sub)); }));
+  const subjects=[...subjectsSet];
+  const stats={};
+  const last7=datesInRange(7), last30=datesInRange(30);
+  subjects.forEach(sub=>{
+    let present=0, absent=0, total=0;
+    let wP=0,wA=0, wT=0, mP=0,mA=0, mT=0;
+    Object.entries(store).forEach(([date, arr])=>{
+      const sd=new Date(date); const slots=slotsForDate(sd);
+      arr.forEach((mark,i)=>{
+        const subj = subjectFrom(slots[i]?.[1]||'');
+        if (subj===sub && isRealClass(subj)){
+          total++; if(mark==='Present')present++; if(mark==='Absent')absent++;
+          if (last7.includes(date)){ wT++; if(mark==='Present')wP++; if(mark==='Absent')wA++; }
+          if (last30.includes(date)){ mT++; if(mark==='Present')mP++; if(mark==='Absent')mA++; }
+        }
+      });
+    });
+    const overallPct = (present+absent)===0?0:(present/(present+absent))*100;
+    const weekPct = (wP+wA)===0?0:(wP/(wP+wA))*100;
+    const monthPct = (mP+mA)===0?0:(mP/(mP+mA))*100;
+    stats[sub]={present, absent, total, overallPct, weekPct, monthPct};
+  });
+  return stats;
+}
+function renderSubjects(){
+  const box=$('#subjects'); box.innerHTML='';
+  const stats=computeSubjectStats();
+  Object.entries(stats).forEach(([sub, s])=>{
+    const card=document.createElement('div'); card.className='card inner';
+    card.innerHTML = `<h4>${sub}</h4>
+      <p>Total sessions: ${s.total} • Present: ${s.present} • Absent: ${s.absent}</p>
+      <div class="bar"><div style="width:${s.overallPct.toFixed(1)}%"></div></div>
+      <p class="tiny">Overall %: ${s.overallPct.toFixed(1)}%</p>
+      <div style="display:grid;grid-template-columns:1fr 1fr; gap:10px; margin-top:8px">
+        <div>
+          <p class="tiny">Last 7 days</p>
+          <div class="bar"><div style="width:${s.weekPct.toFixed(1)}%"></div></div>
+          <p class="tiny">${s.weekPct.toFixed(1)}%</p>
+        </div>
+        <div>
+          <p class="tiny">Last 30 days</p>
+          <div class="bar"><div style="width:${s.monthPct.toFixed(1)}%"></div></div>
+          <p class="tiny">${s.monthPct.toFixed(1)}%</p>
+        </div>
+      </div>`;
+    box.appendChild(card);
+  });
+}
+
+/* ========= GALLERY ========= */
+const galleryKey = 'gallery_v1';
+function renderGallery(){
+  const grid = $('#galleryGrid'); grid.innerHTML='';
+  const items = LS.get(galleryKey, []);
+  items.forEach((it, idx)=>{
+    const url=it.url;
+    const div=document.createElement('div'); div.className='thumb';
+    const img=document.createElement('img'); img.src=url;
+    const del=document.createElement('button'); del.className='del'; del.textContent='✕';
+    del.addEventListener('click', ()=>{ const list=LS.get(galleryKey,[]); list.splice(idx,1); LS.set(galleryKey,list); renderGallery(); URL.revokeObjectURL(url); });
+    div.appendChild(img); div.appendChild(del); grid.appendChild(div);
+  });
+}
+async function handleFiles(files){
+  const list=LS.get(galleryKey,[]);
+  for (const f of files){ const url=URL.createObjectURL(f); list.unshift({ url, ts:Date.now(), name:f.name }); }
+  LS.set(galleryKey, list); renderGallery();
+}
+$('#pickImages').addEventListener('change', e=>handleFiles(e.target.files));
+$('#cameraCapture').addEventListener('change', e=>handleFiles(e.target.files));
+
+
+/* ========= PLAYLIST MANAGER ========= */
+const keyPlay = 'user_playlists';
+const defaults = [
+  { name: 'Seedhe Maut • Essentials', link: 'https://open.spotify.com/artist/2qoQgPA6y1B4SZaPkFziS7' },
+  { name: 'Taylor Swift • Love Songs', link: 'https://open.spotify.com/artist/06HL4z0CvFAxyc27GXpf02' },
+  { name: 'English Chill • Mix', link: 'https://open.spotify.com/playlist/37i9dQZF1DX4WYpdgoIcn6' },
+  { name: 'Feel-Good Pop', link: 'https://open.spotify.com/playlist/37i9dQZF1DX1g0iEXLFycr' }
+];
+
+function renderPlaylists() {
+  const box = $('#playlistList');
+  if (!box) return;
+  box.innerHTML = '';
+
+  const user = LS.get(keyPlay, []);
+  const all = [...defaults, ...user];
+
+  all.forEach((p, idx) => {
+    const div = document.createElement('div');
+    div.className = 'card inner';
+    div.innerHTML = `
+      <h4>${p.name}</h4>
+      <div class="row">
+        <a class="btn" href="${p.link}" target="_blank" rel="noopener">Open on Spotify</a>
+        ${idx >= defaults.length ? `<button data-i="${idx - defaults.length}" class="btn ghost delPl">Remove</button>` : ''}
+      </div>`;
+    box.appendChild(div);
+  });
+
+  $$('.delPl').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const i = parseInt(btn.dataset.i);
+      const arr = LS.get(keyPlay, []);
+      arr.splice(i, 1);
+      LS.set(keyPlay, arr);
+      renderPlaylists();
+    });
+  });
+}
+
+$('#addPlaylist')?.addEventListener('click', () => {
+  const n = $('#plName').value.trim();
+  const l = $('#plLink').value.trim();
+  if (!n || !l) return alert('Enter both name and link');
+  const arr = LS.get(keyPlay, []);
+  arr.push({ name: n, link: l });
+  LS.set(keyPlay, arr);
+  $('#plName').value = '';
+  $('#plLink').value = '';
+  renderPlaylists();
+});
+
+renderPlaylists();
+
+
+/* ========= FITNESS ========= */
+let stepEstimate = LS.get('steps', 0) || 0; let lastMag = 0;
+function onMotion(e){
+  const a = e.accelerationIncludingGravity; if(!a) return;
+  const mag = Math.sqrt(a.x*a.x + a.y*a.y + a.z*a.z);
+  if (lastMag !== 0){ const diff = Math.abs(mag - lastMag); if (diff > 3.2) stepEstimate++; $('#steps').textContent = stepEstimate; }
+  lastMag = mag;
+}
+function startSteps(){
+  if (typeof DeviceMotionEvent !== 'undefined' && typeof DeviceMotionEvent.requestPermission === 'function') {
+    DeviceMotionEvent.requestPermission().then(res=>{ if(res==='granted') addEventListener('devicemotion', onMotion); else alert('Motion permission not granted'); }).catch(()=>alert('Motion permission error.'));
+  } else { addEventListener('devicemotion', onMotion); }
+}
+function stopSteps(){ removeEventListener('devicemotion', onMotion); LS.set('steps', stepEstimate); }
+$('#startSteps').addEventListener('click', startSteps);
+$('#stopSteps').addEventListener('click', stopSteps);
+$('#steps').textContent = stepEstimate;
+$('#applySteps').addEventListener('click', ()=>{ const v=parseInt($('#manualSteps').value,10)||0; stepEstimate=v; LS.set('steps', stepEstimate); $('#steps').textContent = stepEstimate; });
+
+$('#savePulse').addEventListener('click', ()=>{ const v=parseInt($('#pulse').value,10); if(isNaN(v)) return alert('Enter a number'); LS.set('pulse', {v, ts:Date.now()}); $('#pulseSaved').textContent = `${v} bpm at ${new Date().toLocaleString()}`; });
+(function(){ const p=LS.get('pulse'); if(p) $('#pulseSaved').textContent = `${p.v} bpm at ${new Date(p.ts).toLocaleString()}`; })();
+
+/* ========= INIT ON LOAD ========= */
+function initHydration(){ const cfg=LS.get(keyCfg); if(cfg?.on) scheduleHydration(cfg.minutes); updateHydrationStatus(); renderToday(); renderWeek(); }
+function initTimetable(){ renderTimetable(); }
+function initAttendance(){ renderDay(); renderSubjects(); }
+function initGallery(){ renderGallery(); }
+
+initHydration(); initTimetable(); initAttendance(); initGallery();
+
+/* ========= PWA INSTALL + SERVICE WORKER ========= */
+let deferredPrompt=null;
+window.addEventListener('beforeinstallprompt', (e)=>{ e.preventDefault(); deferredPrompt=e; $('#installPrompt').classList.remove('hidden'); });
+$('#installBtn').addEventListener('click', async ()=>{ if(!deferredPrompt) return; deferredPrompt.prompt(); await deferredPrompt.userChoice; $('#installPrompt').classList.add('hidden'); deferredPrompt=null; });
+$('#installClose').addEventListener('click', ()=>$('#installPrompt').classList.add('hidden'));
+
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', ()=>{ navigator.serviceWorker.register('service-worker.js'); });
+}
+</script>
+</body>
+</html>
