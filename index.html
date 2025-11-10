@@ -456,26 +456,43 @@ const timetable = {
     ["All day","Holiday"]
   ]
 };
-function isRealClass(subj){ const s=subj.toLowerCase(); return !(s.includes('free for her')||s.includes('lunch')||s.includes('holiday')); }
+// ✅ Identify real classes (both theory and practicals)
+function isRealClass(subj) {
+  const s = subj.toLowerCase();
+  // skip breaks or non-academic items
+  if (s.includes('free for her') || s.includes('lunch') || s.includes('holiday') || s.includes('work programme')) {
+    return false;
+  }
+  // count everything else (theory or practical)
+  if (s.includes('lpm') || s.includes('van') || s.includes('vpy') || s.includes('physiology')) {
+    return true;
+  }
+  return false;
+}
+
+// ✅ Map timetable subject titles to clean labels
 function subjectFrom(name) {
   const s = name.toLowerCase();
 
   // Detect practicals (Batch C or "(P)")
-  if (s.includes("batch c") || s.includes("(p)")) {
-    if (s.includes("lpm")) return "LPM (P)";
-    if (s.includes("van")) return "VAN (P)";
-    if (s.includes("vpy") || s.includes("physiology")) return "VPY (P)";
+  if (s.includes('batch c') || s.includes('(p)')) {
+    if (s.includes('lpm')) return 'LPM (P)';
+    if (s.includes('van')) return 'VAN (P)';
+    if (s.includes('vpy') || s.includes('physiology')) return 'VPY (P)'; // physiology practical = VPY (P)
   }
 
-  // Detect theory
-  if (s.includes("lpm")) return "LPM";
-  if (s.includes("van")) return "VAN";
-  if (s.includes("vpy") || s.includes("physiology")) return "VPY";
+  // Detect theory subjects
+  if (s.includes('lpm')) return 'LPM';
+  if (s.includes('van')) return 'VAN';
+  if (s.includes('vpy') || s.includes('physiology')) return 'VPY';
 
   return name;
 }
+
+// ✅ Subject categories for fixed rendering order
 const SUBJECTS_THEORY    = ['LPM', 'VAN', 'VPY'];
 const SUBJECTS_PRACTICAL = ['LPM (P)', 'VAN (P)', 'VPY (P)'];
+
 
 function renderTimetable(){
   const c=$('#ttContainer'); if(!c) return; c.innerHTML='';
